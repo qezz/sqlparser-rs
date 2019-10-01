@@ -854,7 +854,12 @@ impl Parser {
 
     /// Parse a SQL CREATE statement
     pub fn parse_create(&mut self) -> Result<Statement, ParserError> {
-        if self.parse_keyword("TABLE") {
+
+        println!("parse create");
+        if self.parse_keyword("OR") {
+            println!("parse create_or_replace");
+            self.parse_create_or_replace()
+        } else if self.parse_keyword("TABLE") {
             self.parse_create_table()
         } else if self.parse_keyword("MATERIALIZED") || self.parse_keyword("VIEW") {
             self.prev_token();
@@ -864,6 +869,33 @@ impl Parser {
         } else {
             self.expected("TABLE or VIEW after CREATE", self.peek_token())
         }
+    }
+
+    /// Parse an SQL CREATE OR REPLACE statement
+    pub fn parse_create_or_replace(&mut self) -> Result<Statement, ParserError> {
+    //     // self.expect_keywords(&["OR", "REPLACE"])?;
+    //     self.expect_keyword("REPLACE")?;
+
+
+    //     let do_replace = true;
+    //     let temporary =
+    //         self.parse_keyword("TEMPORARY") || self.parse_keyword("TEMP");
+        
+    //     let view = self.parse_create_view()?;
+
+    //     Ok(Statement::CreateView {
+    //         name: view.name,
+    //         columns: view.columns,
+    //         query: view.query,
+    //         materialized: view.materialized,
+    //         with_options: view.with_options,
+            
+    //         do_replace,
+    //         temporary,
+        //     })
+
+        self.prev_token();
+        self.parse_create_view()
     }
 
     pub fn parse_create_external_table(&mut self) -> Result<Statement, ParserError> {
@@ -888,6 +920,20 @@ impl Parser {
     }
 
     pub fn parse_create_view(&mut self) -> Result<Statement, ParserError> {
+
+        println!("token peek: {:?}", self.peek_token());
+        let do_replace = self.parse_keyword("OR") && self.parse_keyword("REPLACE");
+        
+        let temporary = {
+            if self.parse_keyword("TEMP") {
+                TemporaryOption::Short
+            } else if self.parse_keyword("TEMPORARY") {
+                TemporaryOption::Long
+            } else {
+                TemporaryOption::None
+            }
+        };
+
         let materialized = self.parse_keyword("MATERIALIZED");
         self.expect_keyword("VIEW")?;
         // Many dialects support `OR REPLACE` | `OR ALTER` right after `CREATE`, but we don't (yet).
@@ -897,12 +943,15 @@ impl Parser {
         let with_options = self.parse_with_options()?;
         self.expect_keyword("AS")?;
         let query = Box::new(self.parse_query()?);
+
         // Optional `WITH [ CASCADED | LOCAL ] CHECK OPTION` is widely supported here.
         Ok(Statement::CreateView {
             name,
             columns,
             query,
             materialized,
+            do_replace,
+            temporary,
             with_options,
         })
     }

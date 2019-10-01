@@ -592,6 +592,119 @@ mod tests {
     }
 
     #[test]
+    fn tokenize_simple_create() {
+        let sql = String::from("CREATE TABLE customers (person_id int)");
+        let dialect = GenericDialect {};
+        let mut tokenizer = Tokenizer::new(&dialect, &sql);
+        let tokens = tokenizer.tokenize().unwrap();
+
+        let expected = vec![
+            Token::make_keyword("CREATE"),
+            Token::Whitespace(Whitespace::Space),
+            Token::make_keyword("TABLE"),
+            Token::Whitespace(Whitespace::Space),
+            Token::make_word("customers", None),
+            Token::Whitespace(Whitespace::Space),
+            Token::LParen,
+            Token::make_word("person_id", None),
+            Token::Whitespace(Whitespace::Space),
+            Token::make_keyword("int"),
+            Token::RParen,
+        ];
+
+        compare(expected, tokens);
+    }
+
+    #[test]
+    fn tokenize_create_or_replace() {
+        let sql = String::from("CREATE OR REPLACE TABLE customers (person_id int)");
+        let dialect = GenericDialect {};
+        let mut tokenizer = Tokenizer::new(&dialect, &sql);
+        let tokens = tokenizer.tokenize().unwrap();
+
+        let expected = vec![
+            Token::make_keyword("CREATE"),
+            Token::Whitespace(Whitespace::Space),
+            Token::make_keyword("OR"),
+            Token::Whitespace(Whitespace::Space),
+            Token::make_keyword("REPLACE"),
+            Token::Whitespace(Whitespace::Space),
+            Token::make_keyword("TABLE"),
+            Token::Whitespace(Whitespace::Space),
+            Token::make_word("customers", None),
+            Token::Whitespace(Whitespace::Space),
+            Token::LParen,
+            Token::make_word("person_id", None),
+            Token::Whitespace(Whitespace::Space),
+            Token::make_keyword("int"),
+            Token::RParen,
+        ];
+
+        compare(expected, tokens);
+    }
+
+    #[test]
+    fn tokenize_create_or_replace_temp_view() {
+        let sql = String::from("CREATE OR REPLACE TEMP VIEW customers (person_id int)");
+        let dialect = GenericDialect {};
+        let mut tokenizer = Tokenizer::new(&dialect, &sql);
+        let tokens = tokenizer.tokenize().unwrap();
+
+        let expected = vec![
+            Token::make_keyword("CREATE"),
+            Token::Whitespace(Whitespace::Space),
+            Token::make_keyword("OR"),
+            Token::Whitespace(Whitespace::Space),
+            Token::make_keyword("REPLACE"),
+            Token::Whitespace(Whitespace::Space),
+            Token::make_keyword("TEMP"),
+            Token::Whitespace(Whitespace::Space),
+            Token::make_keyword("VIEW"),
+            Token::Whitespace(Whitespace::Space),
+            Token::make_word("customers", None),
+            Token::Whitespace(Whitespace::Space),
+            Token::LParen,
+            Token::make_word("person_id", None),
+            Token::Whitespace(Whitespace::Space),
+            Token::make_keyword("int"),
+            Token::RParen,
+        ];
+
+        compare(expected, tokens);
+    }
+
+    #[test]
+    fn tokenize_create_or_replace_temporary_view() {
+        let sql = String::from("CREATE OR REPLACE TEMPORARY VIEW customers (person_id int)");
+        let dialect = GenericDialect {};
+        let mut tokenizer = Tokenizer::new(&dialect, &sql);
+        let tokens = tokenizer.tokenize().unwrap();
+
+        let expected = vec![
+            Token::make_keyword("CREATE"),
+            Token::Whitespace(Whitespace::Space),
+            Token::make_keyword("OR"),
+            Token::Whitespace(Whitespace::Space),
+            Token::make_keyword("REPLACE"),
+            Token::Whitespace(Whitespace::Space),
+            Token::make_keyword("TEMPORARY"),
+            Token::Whitespace(Whitespace::Space),
+            Token::make_keyword("VIEW"),
+            Token::Whitespace(Whitespace::Space),
+            Token::make_word("customers", None),
+            Token::Whitespace(Whitespace::Space),
+            Token::LParen,
+            Token::make_word("person_id", None),
+            Token::Whitespace(Whitespace::Space),
+            Token::make_keyword("int"),
+            Token::RParen,
+        ];
+
+        compare(expected, tokens);
+    }
+
+
+    #[test]
     fn tokenize_string_predicate() {
         let sql = String::from("SELECT * FROM customer WHERE salary != 'Not Provided'");
         let dialect = GenericDialect {};

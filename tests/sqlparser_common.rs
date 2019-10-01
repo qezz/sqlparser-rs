@@ -2069,6 +2069,8 @@ fn parse_create_view() {
             columns,
             query,
             materialized,
+            do_replace,
+            temporary,
             with_options,
         } => {
             assert_eq!("myschema.myview", name.to_string());
@@ -2114,12 +2116,16 @@ fn parse_create_view_with_columns() {
             with_options,
             query,
             materialized,
+            do_replace,
+            temporary,
         } => {
             assert_eq!("v", name.to_string());
             assert_eq!(columns, vec!["has".to_string(), "cols".to_string()]);
             assert_eq!(with_options, vec![]);
             assert_eq!("SELECT 1, 2", query.to_string());
             assert!(!materialized);
+            assert!(!do_replace);
+            assert_eq!(temporary, TemporaryOption::None);
         }
         _ => unreachable!(),
     }
@@ -2134,12 +2140,16 @@ fn parse_create_materialized_view() {
             columns,
             query,
             materialized,
+            do_replace,
+            temporary,
             with_options,
         } => {
             assert_eq!("myschema.myview", name.to_string());
             assert_eq!(Vec::<Ident>::new(), columns);
             assert_eq!("SELECT foo FROM bar", query.to_string());
             assert!(materialized);
+            assert!(!do_replace);
+            assert_eq!(temporary, TemporaryOption::None);
             assert_eq!(with_options, vec![]);
         }
         _ => unreachable!(),

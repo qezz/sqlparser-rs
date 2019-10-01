@@ -408,6 +408,8 @@ pub enum Statement {
         columns: Vec<Ident>,
         query: Box<Query>,
         materialized: bool,
+        do_replace: bool,
+        temporary: TemporaryOption,
         with_options: Vec<SqlOption>,
     },
     /// CREATE TABLE
@@ -546,9 +548,27 @@ impl fmt::Display for Statement {
                 columns,
                 query,
                 materialized,
+                do_replace,
+                temporary,
                 with_options,
             } => {
                 write!(f, "CREATE")?;
+
+                if *do_replace {
+                    write!(f, " OR REPLACE")?;
+                }
+
+                // Should it be before or after the `MATERIALIZED` keyword
+                match *temporary {
+                    TemporaryOption::Long => {
+                        write!(f, " TEMPORARY")?;
+                    },
+                    TemporaryOption::Short => {
+                        write!(f, " TEMP")?;
+                    },
+                    TemporaryOption::None => { /* skip */ }
+                }
+
                 if *materialized {
                     write!(f, " MATERIALIZED")?;
                 }
@@ -866,6 +886,24 @@ impl fmt::Display for SetVariableValue {
         match self {
             Ident(ident) => f.write_str(ident),
             Literal(literal) => write!(f, "{}", literal),
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum TemporaryOption {
+    Long,
+    Short,
+    None,
+}
+
+impl fmt::Display for TemporaryOption {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        use TemporaryOption::*;
+        match self {
+            Long => f.write_str("TEMPORARY"),
+            Short => f.write_str("TEMP"),
+            None => f.write_str(""),
         }
     }
 }
