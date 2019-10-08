@@ -1,3 +1,5 @@
+#![feature(box_syntax, box_patterns)]
+
 use sqlparser::ast::*;
 use sqlparser::dialect::{GenericDialect, SparkSqlDialect};
 use sqlparser::parser::ParserError;
@@ -96,26 +98,52 @@ FROM fake_table)";
 
             println!("query.body: {:#?}", query.body);
 
-            match query.body {
-                SetExpr::Query(boxed_query) => {
-                    match *boxed_query {
-                        // SetExpr::Select(boxed_select) => {
-                        //     println!("boxed_select: {:#?}", boxed_select);
-                        // }
-                        Query {
-                            body,
-                            ..
-                        } => {
-                            match body {
-                                SetExpr::Select(boxed_s) => {
-                                    println!("boxed: {:#?}", boxed_s.projection);
-                                },
-                                _ => unreachable!(),
-                            }
+            // match query.body {
+            //     SetExpr::Query(boxed_query) => {
+            //         match *boxed_query {
+            //             // SetExpr::Select(boxed_select) => {
+            //             //     println!("boxed_select: {:#?}", boxed_select);
+            //             // }
+            //             Query {
+            //                 body,
+            //                 ..
+            //             } => {
+            //                 match body {
+            //                     SetExpr::Select(boxed_s) => {
+            //                         println!("boxed: {:#?}", boxed_s.projection);
+            //                     },
+            //                     _ => unreachable!(),
+            //                 }
+            //             }
+            //         }
+            //     },
+            //     _ => unreachable!(),
+            // }
+
+            if let SetExpr::Query(box Query { body, .. }) = query.body {
+                // println!("NNNNNNN");
+                if let SetExpr::Select(box Select { projection, .. }) = body {
+                    // println!("proj: {:#?}", projection);
+
+                    for proj_exp in projection {
+                        // println!("expr: {:#?}", expr);
+                        match proj_exp {
+                            SelectItem::UnnamedExpr(e) => {
+
+                            },
+                            SelectItem::ExprWithAlias{ expr, .. } => {
+                                println!("expr: {:#?}", expr);
+                                if let Expr::Function(Function{ name, args, .. }) = expr {
+                                    println!("name: {:#?}", name);
+                                    println!("args: {:#?}", args);
+                                }
+                            },
+                            _ => unreachable!(),
                         }
                     }
-                },
-                _ => unreachable!(),
+                }
+            } else {
+                // println!("FALSE");
             }
         },
         _ => unreachable!(),
