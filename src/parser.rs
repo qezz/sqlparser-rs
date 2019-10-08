@@ -855,9 +855,9 @@ impl Parser {
     /// Parse a SQL CREATE statement
     pub fn parse_create(&mut self) -> Result<Statement, ParserError> {
 
-        println!("parse create");
+        // println!("parse create");
         if self.parse_keyword("OR") {
-            println!("parse create_or_replace");
+            // println!("parse create_or_replace");
             self.parse_create_or_replace()
         } else if self.parse_keyword("TABLE") {
             self.parse_create_table()
@@ -921,7 +921,7 @@ impl Parser {
 
     pub fn parse_create_view(&mut self) -> Result<Statement, ParserError> {
 
-        println!("token peek: {:?}", self.peek_token());
+        // println!("token peek: {:?}", self.peek_token());
         let do_replace = self.parse_keyword("OR") && self.parse_keyword("REPLACE");
         
         let temporary = {
