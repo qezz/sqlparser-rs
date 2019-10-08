@@ -1641,6 +1641,12 @@ impl Parser {
             None
         };
 
+        let cluster = if self.parse_keyword("CLUSTER") {
+            Some(self.parse_expr()?)
+        } else {
+            None
+        };
+
         Ok(Select {
             distinct,
             projection,
@@ -1648,6 +1654,7 @@ impl Parser {
             selection,
             group_by,
             having,
+            cluster,
         })
     }
 

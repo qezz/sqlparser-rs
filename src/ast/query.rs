@@ -124,6 +124,8 @@ pub struct Select {
     pub group_by: Vec<Expr>,
     /// HAVING
     pub having: Option<Expr>,
+    /// CLUSTER
+    pub cluster: Option<Expr>,
 }
 
 impl fmt::Display for Select {
