@@ -98,6 +98,7 @@ define_keywords!(
     CHECK,
     CLOB,
     CLOSE,
+    CLUSTER,
     COALESCE,
     COLLATE,
     COLLECT,
