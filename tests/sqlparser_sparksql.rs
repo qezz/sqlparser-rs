@@ -149,3 +149,24 @@ FROM fake_table)";
         _ => unreachable!(),
     }
 }
+
+
+#[test]
+fn parse_set() {
+    let sql = "set hivevar:BLAH=2001-01-01";
+
+    //match sparksql().verified_stmt(sql) {
+    match sparksql().parse_sql_statements(sql).unwrap().pop().unwrap() {
+        Statement::SetVariable {
+            // local,
+            variable,
+            value,
+            ..
+        } => {
+            // assert!(local);
+            assert_eq!(variable, "hivevar:BLAH");
+            assert_eq!(value, SetVariableValue::Literal(Value::Null));
+        },
+        _ => unreachable!(),
+    }
+}

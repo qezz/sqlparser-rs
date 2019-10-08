@@ -1665,6 +1665,19 @@ impl Parser {
         if self.consume_token(&Token::Colon) {
             let x = self.parse_identifier()?;
             variable = format!("{}:{}", variable, x);
+
+            // while self.consume_token(&Token::SemiColon) {
+            //     expecting_statement_delimiter = false;
+            // }
+
+            // self.parse_statement();
+            // self.parse_date_time_field()?;
+
+            while (self.peek_token() != None) && !self.consume_token(&Token::Colon) {
+                // println!("token: {:#?}", self.peek_token());
+                self.next_token();
+            }
+            
             return Ok(Statement::SetVariable {
                 local: modifier == Some("LOCAL"),
                 variable,
