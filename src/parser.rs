@@ -1641,10 +1641,10 @@ impl Parser {
             None
         };
 
-        let cluster = if self.parse_keyword("CLUSTER") {
-            Some(self.parse_expr()?)
+        let cluster = if self.parse_keywords(vec!["CLUSTER", "BY"]) || self.parse_keyword("CLUSTER") {
+            self.parse_comma_separated(Parser::parse_expr)?
         } else {
-            None
+            vec![]
         };
 
         Ok(Select {
