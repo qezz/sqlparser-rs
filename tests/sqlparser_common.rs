@@ -2072,6 +2072,7 @@ fn parse_create_view() {
             do_replace,
             temporary,
             with_options,
+            ..
         } => {
             assert_eq!("myschema.myview", name.to_string());
             assert_eq!(Vec::<Ident>::new(), columns);
@@ -2118,6 +2119,7 @@ fn parse_create_view_with_columns() {
             materialized,
             do_replace,
             temporary,
+            ..
         } => {
             assert_eq!("v", name.to_string());
             assert_eq!(columns, vec!["has".to_string(), "cols".to_string()]);
@@ -2143,6 +2145,7 @@ fn parse_create_materialized_view() {
             do_replace,
             temporary,
             with_options,
+            ..
         } => {
             assert_eq!("myschema.myview", name.to_string());
             assert_eq!(Vec::<Ident>::new(), columns);

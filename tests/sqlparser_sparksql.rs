@@ -24,6 +24,7 @@ fn parse_create_or_replace_temporary_view() {
             do_replace,
             temporary,
             with_options,
+            ..
         } => {
             assert_eq!("v", name.to_string());
             assert_eq!(Vec::<Ident>::new(), columns);
@@ -50,6 +51,7 @@ fn parse_create_or_replace_temp_view() {
             do_replace,
             temporary,
             with_options,
+            ..
         } => {
             assert_eq!("v", name.to_string());
             assert_eq!(Vec::<Ident>::new(), columns);

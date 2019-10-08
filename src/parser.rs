@@ -944,6 +944,8 @@ impl Parser {
         self.expect_keyword("AS")?;
         let query = Box::new(self.parse_query()?);
 
+        let cluster = None;
+
         // Optional `WITH [ CASCADED | LOCAL ] CHECK OPTION` is widely supported here.
         Ok(Statement::CreateView {
             name,
@@ -953,6 +955,7 @@ impl Parser {
             do_replace,
             temporary,
             with_options,
+            cluster
         })
     }
 

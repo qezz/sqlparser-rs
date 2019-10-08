@@ -411,6 +411,9 @@ pub enum Statement {
         do_replace: bool,
         temporary: TemporaryOption,
         with_options: Vec<SqlOption>,
+
+        // Ignored
+        cluster: Option<Ident>,
     },
     /// CREATE TABLE
     CreateTable {
@@ -551,6 +554,7 @@ impl fmt::Display for Statement {
                 do_replace,
                 temporary,
                 with_options,
+                cluster
             } => {
                 write!(f, "CREATE")?;
 
@@ -583,7 +587,13 @@ impl fmt::Display for Statement {
                     write!(f, " ({})", display_comma_separated(columns))?;
                 }
 
-                write!(f, " AS {}", query)
+                write!(f, " AS {}", query)?;
+
+                if cluster.is_some() {
+                    write!(f, " CLUSTER BY {}", cluster.clone().unwrap())?;
+                }
+
+                write!(f, "")
             }
             Statement::CreateTable {
                 name,
