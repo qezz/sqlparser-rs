@@ -190,3 +190,36 @@ fn parse_spark_set_2() {
         _ => unreachable!(),
     }
 }
+
+#[test]
+fn parse_sets() {
+    let sql = r#"
+set hivevar:BLAH1=2001-01-01;
+set hivevar:BLAH2=2002-01-01;
+
+CREATE OR REPLACE TEMPORARY VIEW v AS (
+    SELECT
+        cast('${hivevar:BLAH1}' AS DATE) AS BLAH_DATE1,
+        cast('${hivevar:BLAH2}' AS DATE) AS BLAH_DATE2
+);
+"#;
+
+
+    match sparksql().parse_sql_statements(sql).unwrap().pop().unwrap() {
+        Statement::SetVariable {
+            // local,
+            variable,
+            value,
+            ..
+        } => {
+            // assert!(local);
+            assert_eq!(variable, "hivevar:BLAH");
+            assert_eq!(value, SetVariableValue::Literal(Value::Null));
+        },
+        Statement::CreateView {
+            ..
+        } => {},
+        _ => unreachable!(),
+    }
+
+}
