@@ -1664,7 +1664,12 @@ impl Parser {
 
         if self.consume_token(&Token::Colon) {
             let x = self.parse_identifier()?;
-            variable = format!("{}:{}", variable, x)
+            variable = format!("{}:{}", variable, x);
+            return Ok(Statement::SetVariable {
+                local: modifier == Some("LOCAL"),
+                variable,
+                value: SetVariableValue::Literal(Value::Null),
+            })
         }
         
         if self.consume_token(&Token::Eq) || self.parse_keyword("TO") {
