@@ -1660,7 +1660,13 @@ impl Parser {
 
     pub fn parse_set(&mut self) -> Result<Statement, ParserError> {
         let modifier = self.parse_one_of_keywords(&["SESSION", "LOCAL"]);
-        let variable = self.parse_identifier()?;
+        let mut variable = self.parse_identifier()?;
+
+        if self.consume_token(&Token::Colon) {
+            let x = self.parse_identifier()?;
+            variable = format!("{}:{}", variable, x)
+        }
+        
         if self.consume_token(&Token::Eq) || self.parse_keyword("TO") {
             let token = self.peek_token();
             let value = match (self.parse_value(), token) {
