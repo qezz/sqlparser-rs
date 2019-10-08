@@ -1673,8 +1673,12 @@ impl Parser {
             // self.parse_statement();
             // self.parse_date_time_field()?;
 
-            while (self.peek_token() != None) && !self.consume_token(&Token::Colon) {
-                // println!("token: {:#?}", self.peek_token());
+            while self.peek_token() != None {
+                if self.consume_token(&Token::SemiColon) {
+                    // println!("token: {:#?}", self.peek_token());
+                    self.prev_token();
+                    break
+                }
                 self.next_token();
             }
             

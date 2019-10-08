@@ -152,8 +152,28 @@ FROM fake_table)";
 
 
 #[test]
-fn parse_set() {
+fn parse_spark_set() {
     let sql = "set hivevar:BLAH=2001-01-01";
+
+    //match sparksql().verified_stmt(sql) {
+    match sparksql().parse_sql_statements(sql).unwrap().pop().unwrap() {
+        Statement::SetVariable {
+            // local,
+            variable,
+            value,
+            ..
+        } => {
+            // assert!(local);
+            assert_eq!(variable, "hivevar:BLAH");
+            assert_eq!(value, SetVariableValue::Literal(Value::Null));
+        },
+        _ => unreachable!(),
+    }
+}
+
+#[test]
+fn parse_spark_set_2() {
+    let sql = "set hivevar:BLAH=2001-01-01;set hivevar:BLAH=2001-01-01";
 
     //match sparksql().verified_stmt(sql) {
     match sparksql().parse_sql_statements(sql).unwrap().pop().unwrap() {
